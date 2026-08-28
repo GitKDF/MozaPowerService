@@ -67,7 +67,7 @@ jobs:
           "@ | Set-Content out\VersionInfo.cs -Encoding ASCII
           $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
           if (-not (Test-Path $csc)) { throw "csc.exe was not found at $csc" }
-          & $csc /nologo /langversion:5 /target:winexe /out:out\MozaPowerService.exe `
+          & $csc /nologo /langversion:5 /target:exe /out:out\MozaPowerService.exe `
             /reference:System.dll /reference:System.Core.dll /reference:System.Management.dll `
             /reference:System.ServiceProcess.dll MozaPowerService.cs out\VersionInfo.cs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
