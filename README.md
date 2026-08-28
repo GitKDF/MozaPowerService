@@ -7,8 +7,8 @@ MozaPowerService is an independent open-source project licensed under the GNU Ge
 
 ## Features
 
-- Sends the ON command when the service starts.
-- Sends the OFF command during shutdown, sleep, or service stop, according to configuration.
+- Sends the ON command when the service starts and when resuming from suspend or hibernate.
+- Sends the OFF command during shutdown, sleep, or service stop.
 - Works whether MOZA Pit House is running or not.
 - Checks GitHub for a newer release at service startup and daily thereafter.
 - Will not cycle work mode when updating--no surprise loss of wheel power mid race due to an update.
@@ -19,7 +19,7 @@ MozaPowerService is an independent open-source project licensed under the GNU Ge
 - Administrator privileges for installation, service management, and self-updates.
 - A supported Moza wheelbase.
 
-The following devices are currently supported:
+The following devices are currently believed to be supported:
 
 | Model            | Vendor ID | Product ID | Tested |
 |------------------|-----------|------------|--------|
@@ -60,7 +60,7 @@ The order is:
 1111111
 │││││││
 ││││││└ Enable automatic updates
-│││││└─ Enable OFF command when the service stops
+│││││└─ Enable OFF command when the service stops (backup to shutdown, can likely safely be disabled)
 ││││└── Enable ON command after automatic resume (when windows wakes itself)
 │││└─── Enable ON command after user-initiated resume
 ││└──── Enable OFF command before sleep or hibernation
