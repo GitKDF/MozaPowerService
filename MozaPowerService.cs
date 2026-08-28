@@ -12,6 +12,11 @@ using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
 
+public static class BuildInfo
+{
+    public const string Version = "0.8.02";
+}
+
 // =======================================================================================
 // SECTION 1: Native Win32 Interop & P/Invoke Definitions
 // =======================================================================================
@@ -643,7 +648,7 @@ public static class ServiceUpdater
             string response;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(RepositoryApiUrl);
             request.Method = "GET";
-            request.UserAgent = "MozaPowerService/" + Program.Version;
+            request.UserAgent = "MozaPowerService/" + BuildInfo.Version;
             request.Timeout = 10000;
 
             using (WebResponse webResponse = request.GetResponse())
@@ -658,14 +663,14 @@ public static class ServiceUpdater
                 return;
 
             Version latestVersion = new Version(tagMatch.Groups[1].Value);
-            Version currentVersion = new Version(Program.Version);
+            Version currentVersion = new Version(BuildInfo.Version);
             if (latestVersion <= currentVersion)
                 return;
 
             string downloadPath = Path.Combine(Path.GetDirectoryName(executablePath), ReleaseAssetName + "." + latestVersion + ".download");
             using (WebClient client = new WebClient())
             {
-                client.Headers[HttpRequestHeader.UserAgent] = "MozaPowerService/" + Program.Version;
+                client.Headers[HttpRequestHeader.UserAgent] = "MozaPowerService/" + BuildInfo.Version;
                 client.DownloadFile(assetMatch.Groups[1].Value, downloadPath);
             }
 
@@ -1556,7 +1561,6 @@ public static class ElevationUtil
 
 public class Program
 {
-    public const string Version = "0.8.01";
     public static string InstalledSettingsArgument = "1111111";
 
     public static void Main(string[] args)
