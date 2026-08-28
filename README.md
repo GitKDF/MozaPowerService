@@ -2,6 +2,9 @@
 
 Windows service that toggles work mode on and off for supported Moza wheelbases in response to PC power events.  If you leave your wheelbase on all of the time (since the tiny power button that you have to push and hold is annoyingly on the back!), this will cycle work mode to put the wheelbase to "sleep" when not in use.  I know some people leave it on all of the time, but this bothered me with the waste of power and some level of wear and tear on the wheelbase itself.
 
+## Disclaimer:
+MozaPowerService is an independent open-source project licensed under the GNU General Public License v3.0. This project is not affiliated with, sponsored by, or endorsed by Gudsen Moza (Gudsen Technology Co., Ltd.). All product names, trademarks, and registered trademarks—including "Moza"—are property of their respective owners. Their use in this project is strictly for identification and compatibility purposes under nominative fair use.
+
 ## Features
 
 - Sends the ON command when the service starts.
