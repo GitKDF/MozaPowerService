@@ -1,0 +1,80 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    permissions:
+      contents: write    # allow creating releases & uploading assets
+      # everything else (issues, pull requests, etc.) defaults to 'none'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate version and create tag
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $source = Get-Content MozaPowerService.cs -Raw
+          if ($source -notmatch 'public const string Version\s*=\s*"([0-9]+\.[0-9]+\.[0-9]+)"') {
+            throw 'Could not find public const string Version in MozaPowerService.cs.'
+          }
+
+          $version = $Matches[1]
+          $tag = "v$version"
+          $current = [Version]$version
+          $latestTag = gh release list --limit 1 --json tagName --jq '.[0].tagName'
+          if ($latestTag) {
+            $latestVersion = $latestTag.TrimStart('v')
+            if ($current -le [Version]$latestVersion) {
+              throw "Version $version is not newer than the latest release $latestTag. Update the source version before merging to main."
+            }
+          }
+
+          $existingTag = git ls-remote --tags origin "refs/tags/$tag"
+          if ($existingTag) {
+            throw "Tag $tag already exists. Update the source version before merging to main."
+          }
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag $tag $env:GITHUB_SHA
+          git push origin $tag
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Compile with C# 5 compiler
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path out | Out-Null
+          $source = Get-Content MozaPowerService.cs -Raw
+          if ($source -notmatch 'public const string Version\s*=\s*"([0-9]+\.[0-9]+\.[0-9]+)"') { throw 'Could not find the source version.' }
+          $version = $Matches[1]
+          @"
+          using System.Reflection;
+          [assembly: AssemblyTitle("MozaPowerService")]
+          [assembly: AssemblyProduct("MozaPowerService")]
+          [assembly: AssemblyDescription("Moza Wheelbase Power Service")]
+          [assembly: AssemblyVersion("$version.0")]
+          [assembly: AssemblyFileVersion("$version.0")]
+          "@ | Set-Content out\VersionInfo.cs -Encoding ASCII
+          $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+          if (-not (Test-Path $csc)) { throw "csc.exe was not found at $csc" }
+          & $csc /nologo /langversion:5 /target:winexe /out:out\MozaPowerService.exe `
+            /reference:System.dll /reference:System.Core.dll /reference:System.Management.dll `
+            /reference:System.ServiceProcess.dll MozaPowerService.cs out\VersionInfo.cs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Create GitHub release
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create $env:TAG out/MozaPowerService.exe --title "MozaPowerService $env:TAG" --generate-notes

@@ -1,0 +1,46 @@
+name: Branch Build on Push
+
+on:
+  push:
+    branches:
+      - '**'          # Matches all branches
+      - '!main'       # Excludes the 'main' branch
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read # Read-only permission is sufficient
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compile with C# 5 compiler
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path out | Out-Null
+          $source = Get-Content MozaPowerService.cs -Raw
+          if ($source -notmatch 'public const string Version\s*=\s*"([0-9]+\.[0-9]+\.[0-9]+)"') { throw 'Could not find the source version.' }
+          $version = $Matches[1]
+          @"
+          using System.Reflection;
+          [assembly: AssemblyTitle("MozaPowerService")]
+          [assembly: AssemblyProduct("MozaPowerService")]
+          [assembly: AssemblyDescription("Moza Wheelbase Power Service")]
+          [assembly: AssemblyVersion("$version.0")]
+          [assembly: AssemblyFileVersion("$version.0")]
+          "@ | Set-Content out\VersionInfo.cs -Encoding ASCII
+          $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+          if (-not (Test-Path $csc)) { throw "csc.exe was not found at $csc" }
+          & $csc /nologo /langversion:5 /target:winexe /out:out\MozaPowerService.exe `
+            /reference:System.dll /reference:System.Core.dll /reference:System.Management.dll `
+            /reference:System.ServiceProcess.dll MozaPowerService.cs out\VersionInfo.cs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MozaPowerService-${{ github.sha }}
+          path: out/MozaPowerService.exe
+          retention-days: 7
