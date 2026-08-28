@@ -1,6 +1,6 @@
 # MozaPowerService
 
-Windows service that toggles work mode on and off for supported Moza wheelbases in response to PC power events.
+Windows service that toggles work mode on and off for supported Moza wheelbases in response to PC power events.  If you leave your wheelbase on all of the time (since the tiny power button that you have to push and hold is annoyingly on the back!), this will cycle work mode to put the wheelbase to "sleep" when not in use.  I know some people leave it on all of the time, but this bothered me with the waste of power and some level of wear and tear on the wheelbase itself.
 
 ## Features
 
@@ -58,7 +58,7 @@ The order is:
 │││││││
 ││││││└ Enable automatic updates
 │││││└─ Enable OFF command when the service stops
-││││└── Enable ON command after automatic resume
+││││└── Enable ON command after automatic resume (when windows wakes itself)
 │││└─── Enable ON command after user-initiated resume
 ││└──── Enable OFF command before sleep or hibernation
 │└───── Enable OFF command during system shutdown
@@ -69,7 +69,7 @@ Examples:
 
 - `1111111`: enable every behavior.
 - `1111110`: enable power-event behavior but disable automatic updates.
-- `0000000`: disable all automatic power commands and updates.
+- `1100000`: enable only startup and shutdown events, no automatic updates.
 
 ## Commands
 ```text
@@ -119,5 +119,5 @@ The executable version is defined near the top of `MozaPowerService.cs` in `Buil
 CashApp (preferred)
 https://cash.app/$KristopherFarrin
 
-Paypal (they take $.49, that's a lot when I expect a few people to send a dollar or two!)
+Paypal (they take $.49, that's a lot when I expect a few people may send a dollar or two!)
 https://paypal.me/GitKDF
