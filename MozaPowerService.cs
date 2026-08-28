@@ -1556,7 +1556,7 @@ public static class ElevationUtil
 
 public class Program
 {
-    public const string Version = "0.8.0";
+    public const string Version = "0.8.01";
     public static string InstalledSettingsArgument = "1111111";
 
     public static void Main(string[] args)
