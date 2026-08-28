@@ -115,6 +115,10 @@ From an elevated PowerShell window in the same directory as the source file:
 
 The executable version is defined near the top of `MozaPowerService.cs` in `BuildInfo.Version`. The update routine uses that value to check for updates.  If you are building locally, either install with updates disabled, or change that to a very high version number.
 
+## AI Usage Disclosure
+
+I did use copilot in VSCode extensively to create this.  I built a similar service years ago to turn my Roku TV-used-as-a-monitor on and off with the PC, and this is a better product than that old project and took a tenth the time!  I wouldn't call it vibe-coded as I look at all of the code, know what it is doing, and caught quite a few errors manually.  That said, it was a lot faster than reading API documentation and hunting on stackexchange.  As so much OSS, this started as a personal project that I thought others might benefit from, so I refined it a bit and put it into the world.
+
 ## Send me a tip
 CashApp (preferred)
 https://cash.app/$KristopherFarrin
