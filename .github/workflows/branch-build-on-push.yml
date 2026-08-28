@@ -5,6 +5,8 @@ on:
     branches:
       - '**'          # Matches all branches
       - '!main'       # Excludes the 'main' branch
+    paths:
+      - 'MozaPowerService.cs'
 
 jobs:
   build:
