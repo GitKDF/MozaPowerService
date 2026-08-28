@@ -21,7 +21,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path out | Out-Null
           $source = Get-Content MozaPowerService.cs -Raw
-          if ($source -notmatch 'public const string Version\s*=\s*"([0-9]+\.[0-9]+\.[0-9]+)"') { throw 'Could not find the source version.' }
+          if ($source -notmatch 'class BuildInfo[\s\S]*?public const string Version\s*=\s*"([0-9]+\.[0-9]+\.[0-9]+)"') { throw 'Could not find the source version.' }
           $version = $Matches[1]
           @"
           using System.Reflection;
